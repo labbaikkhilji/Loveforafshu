@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Afshu Surprise 💖</title>
+<style>
+  body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    overflow: hidden;
+    background: #111;
+    color: #fff;
+  }
+  .center-screen {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 10; /* on top */
+  }
+  button {
+    padding: 15px 25px;
+    font-size: 1.2em;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    background: #ff4dab;
+    color: white;
+    box-shadow: 0 0 10px #ff6eb4;
+  }
+  #loveMessage {
+    margin-top: 20px;
+    font-size: 1.5em;
+    color: #ff6eb4;
+    opacity: 0;
+    transition: opacity 0.5s;
+    text-shadow: 0 0 10px #ff6eb4, 0 0 20px #ff4dab;
+  }
+  #finalMessage {
+    font-size: 2em;
+    color: #ff6eb4;
+    opacity: 0;
+    text-shadow: 0 0 10px #ff6eb4, 0 0 20px #ff4dab;
+  }
+  canvas {
+    position: absolute;
+    top:0;
+    left:0;
+    z-index: 5;
+  }
+</style>
+</head>
+<body>
+
+<!-- LOVE BUTTON SCREEN -->
+<div id="loveButtonScreen" class="center-screen">
+  <button id="loveButton">Click for Labbaik's Gift 💌</button>
+  <div id="loveMessage"></div>
+</div>
+
+<!-- MINI GAME CANVAS -->
+<canvas id="gameCanvas" style="display:none;"></canvas>
+
+<!-- FINAL SURPRISE -->
+<canvas id="heartsCanvas" style="display:none;"></canvas>
+<div id="finalScreen" class="center-screen" style="display:none;">
+  <div id="finalMessage">A kiss from me to you 💋 hehe</div>
+</div>
+
+<!-- KISS SOUND -->
+<audio id="kissSound" src="https://www.soundjay.com/human/sounds/kiss-1.mp3"></audio>
+
+<script>
+// ----------------------- LOVE BUTTON -----------------------
+const loveButton = document.getElementById('loveButton');
+const loveMessage = document.getElementById('loveMessage');
+const messages = ["My cutieee 💕", "Jannu 😘", "Meri Afshu best girl 🌸", "You make me smile 🥰", "Forever yours 💖"];
+let clickCount = 0;
+
+loveButton.addEventListener('click', ()=>{
+  // Show random cute message
+  const msg = messages[Math.floor(Math.random()*messages.length)];
+  loveMessage.innerText = msg;
+  loveMessage.style.opacity = 1;
+  setTimeout(()=>{loveMessage.style.opacity=0}, 1200);
+
+  // Count clicks → after 5 clicks, start mini-game
+  clickCount++;
+  if(clickCount >= 5){
+    document.getElementById('loveButtonScreen').style.display='none';
+    document.getElementById('gameCanvas').style.display='block';
+    startMiniGame();
+  }
+});
+
+// ----------------------- MINI GAME -----------------------
+const gameCanvas = document.getElementById('gameCanvas');
+const ctx = gameCanvas.getContext('2d');
+gameCanvas.width = window.innerWidth;
+gameCanvas.height = window.innerHeight;
+
+let catcher = {x: gameCanvas.width/2 - 50, y: gameCanvas.height - 100, width: 100, height: 20};
+let hearts = [];
+let score = 0;
+let gameOver = false;
+let touchX = catcher.x;
+
+gameCanvas.addEventListener('touchmove', (e)=>{
+  touchX = e.touches[0].clientX - catcher.width/2;
+});
+
+function startMiniGame(){
+  requestAnimationFrame(drawGame);
+  setInterval(spawnHeart, 800);
+}
+
+function spawnHeart(){
+  if(gameOver) return;
+  hearts.push({x: Math.random()*gameCanvas.width, y: -30, size: 30});
+}
+
+function drawGame(){
+  ctx.clearRect(0,0,gameCanvas.width,gameCanvas.height);
+
+  catcher.x += (touchX - catcher.x)*0.2;
+
+  ctx.fillStyle = '#ff4dab';
+  ctx.fillRect(catcher.x, catcher.y, catcher.width, catcher.height);
+
+  ctx.font = '30px Arial';
+  hearts.forEach((h,i)=>{
+    h.y += 5;
+    ctx.fillText('💖', h.x, h.y);
+
+    if(h.y + h.size > catcher.y && h.x + h.size > catcher.x && h.x < catcher.x + catcher.width){
+      hearts.splice(i,1);
+      score++;
+    }
+    if(h.y > gameCanvas.height){
+      hearts.splice(i,1);
+    }
+  });
+
+  ctx.fillStyle = '#fff';
+  ctx.font = '20px Arial';
+  ctx.fillText('Hearts: '+score, 20, 30);
+
+  if(score >= 10){
+    gameOver = true;
+    goToFinalSurprise();
+  } else {
+    requestAnimationFrame(drawGame);
+  }
+}
+
+// ----------------------- FINAL SURPRISE -----------------------
+const heartsCanvas = document.getElementById('heartsCanvas');
+const hCtx = heartsCanvas.getContext('2d');
+const finalScreen = document.getElementById('finalScreen');
+const kissSound = document.getElementById('kissSound');
+
+heartsCanvas.width = window.innerWidth;
+heartsCanvas.height = window.innerHeight;
+
+let heartsArray = [];
+const centerX = heartsCanvas.width/2;
+const centerY = heartsCanvas.height/2;
+
+function goToFinalSurprise(){
+  gameCanvas.style.display='none';
+  heartsCanvas.style.display='block';
+  finalScreen.style.display='block';
+  createHeartShape();
+  animateHeart();
+}
+
+function createHeartShape(){
+  heartsArray = [];
+  for(let t = 0; t < Math.PI*2; t += 0.05){
+    let x = 16*Math.pow(Math.sin(t),3);
+    let y = 13*Math.cos(t) - 5*Math.cos(2*t) - 2*Math.cos(3*t) - Math.cos(4*t);
+    x *= 15;
+    y *= -15;
+    x += centerX;
+    y += centerY;
+    heartsArray.push({x: centerX, y: centerY, targetX: x, targetY: y, size: Math.random()*5+5, alpha: 0});
+  }
+}
+
+function animateHeart(){
+  hCtx.clearRect(0,0,heartsCanvas.width,heartsCanvas.height);
+  let done = true;
+  heartsArray.forEach(h => {
+    h.x += (h.targetX - h.x)*0.05;
+    h.y += (h.targetY - h.y)*0.05;
+    h.alpha += 0.02;
+    hCtx.fillStyle = `rgba(255, 110, 180, ${h.alpha})`;
+    hCtx.beginPath();
+    hCtx.arc(h.x, h.y, h.size, 0, Math.PI*2);
+    hCtx.fill();
+    if(Math.abs(h.x - h.targetX) > 0.5 || Math.abs(h.y - h.targetY) > 0.5) done = false;
+  });
+  if(!done){
+    requestAnimationFrame(animateHeart);
+  } else {
+    burstHearts();
+  }
+}
+
+function burstHearts(){
+  kissSound.play();
+  for(let i=0;i<50;i++){
+    let h = document.createElement('div');
+    h.style.position='absolute';
+    h.style.left = centerX+'px';
+    h.style.top = centerY+'px';
+    h.style.fontSize = (Math.random()*20+20)+'px';
+    h.innerText = '💖';
+    document.body.appendChild(h);
+    let angle = Math.random()*2*Math.PI;
+    let speed = Math.random()*8+2;
+    let vx = Math.cos(angle)*speed;
+    let vy = Math.sin(angle)*speed;
+    let opacity = 1;
+    let id = setInterval(()=>{
+      let left = parseFloat(h.style.left);
+      let top = parseFloat(h.style.top);
+      h.style.left = left + vx + 'px';
+      h.style.top = top + vy + 'px';
+      opacity -= 0.02;
+      h.style.opacity = opacity;
+      if(opacity <= 0){
+        clearInterval(id);
+        h.remove();
+      }
+    },30);
+  }
+  setTimeout(()=>{document.getElementById('finalMessage').style.opacity=1;},1000);
+}
+
+// ----------------------- RESIZE -----------------------
+window.addEventListener('resize',()=>{
+  gameCanvas.width = window.innerWidth;
+  gameCanvas.height = window.innerHeight;
+  heartsCanvas.width = window.innerWidth;
+  heartsCanvas.height = window.innerHeight;
+});
+</script>
+</body>
+</html>
