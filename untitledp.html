@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>💌 For Afshu</title>
+<style>
+  body {
+    margin:0; padding:0;
+    font-family:'Comic Sans MS', cursive;
+    background:#ffe6f0;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    overflow:hidden;
+  }
+  .container {
+    position:relative;
+    width:350px;
+    cursor:pointer;
+    perspective:1000px;
+  }
+  .letter {
+    width:100%;
+    position:relative;
+    border-radius:15px;
+    overflow:hidden;
+    transform-style: preserve-3d;
+  }
+  .envelope {
+    width:100%;
+    display:block;
+    border-radius:15px;
+  }
+  /* Flap animation */
+  .flap {
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:50%;
+    background:#fff0f5;
+    border-bottom:3px solid #ff69b4;
+    transform-origin: top;
+    transition: transform 1s ease-in-out;
+    z-index:5;
+    border-top-left-radius:15px;
+    border-top-right-radius:15px;
+  }
+  .container.open .flap {
+    transform: rotateX(-180deg);
+  }
+  .kitty {
+    position:absolute;
+    top:-50px;
+    left:50%;
+    transform:translateX(-50%);
+    width:120px;
+    z-index:10;
+    transition: top 0.8s;
+    animation: bounce 2s infinite alternate;
+  }
+  @keyframes bounce {
+    0% { transform: translateX(-50%) translateY(-50px);}
+    100% { transform: translateX(-50%) translateY(-40px);}
+  }
+  .message {
+    display:none;
+    position:absolute;
+    top:0; left:0;
+    width:100%; height:100%;
+    background: rgba(255,182,193,0.9);
+    padding:40px 20px 20px 20px;
+    font-size:16px; line-height:1.5;
+    overflow-y:auto;
+    border-radius:15px;
+    color:#333;
+  }
+  .heart-button {
+    margin-top:15px;
+    padding:10px 20px;
+    border:2px solid #ff69b4;
+    border-radius:25px;
+    background:#fff0f5;
+    color:#ff1493;
+    font-weight:bold;
+    cursor:pointer;
+    display:none;
+  }
+  .floating-heart {
+    position:absolute;
+    font-size:20px;
+    color:#ff1493;
+    animation:float linear infinite;
+    pointer-events:none;
+  }
+  @keyframes float {
+    0% {transform: translateY(0) rotate(0deg); opacity:1;}
+    100% {transform: translateY(-600px) rotate(360deg); opacity:0;}
+  }
+  .heart-form {
+    position:absolute;
+    font-size:70px;
+    color:#ff1493;
+    top:50%; left:50%;
+    transform:translate(-50%, -50%);
+    display:none;
+    animation:pop 1s ease forwards;
+    z-index:20;
+  }
+  @keyframes pop {
+    0% {transform:translate(-50%, -50%) scale(0);}
+    100% {transform:translate(-50%, -50%) scale(1);}
+  }
+</style>
+</head>
+<body>
+
+<div class="container" onclick="openLetter()">
+  <img class="envelope" src="https://i.postimg.cc/d0FqGh1T/love-letter.png" alt="Love Letter">
+  <div class="flap"></div>
+  <img class="kitty" src="https://pngimg.com/uploads/hello_kitty/hello_kitty_PNG72.png" alt="Hello Kitty">
+  <div class="message" id="message"></div>
+</div>
+<div class="heart-form" id="heartForm">A❤️</div>
+
+<script>
+let opened=false;
+const fullMessage="We started our chat on 12 June 💌 and you became my gf on 10 Aug ❤️.\nIt's been almost 2 months of our relationship 💕 and I love you so much 😘.\nI can't live without you 😍. I wanna hold your hand 🤝, I wanna kiss you 💋.\nYou are my everything 💖🌸\n\nFrom Labbaik 💌";
+
+function openLetter(){
+  if(opened) return;
+  opened=true;
+  const container=document.querySelector('.container');
+  container.classList.add('open');
+  const msg=document.getElementById('message');
+  msg.style.display='block';
+  document.querySelector('.kitty').style.top='-20px';
+  typeMessage(fullMessage,msg,0);
+  for(let i=0;i<30;i++) setTimeout(createHeart,i*300);
+  document.body.style.background="linear-gradient(to top, #ff9ccf, #ffb6c1)";
+}
+
+function typeMessage(text,el,i){
+  if(i<text.length){
+    el.innerHTML+=text.charAt(i);
+    setTimeout(()=>typeMessage(text,el,i+1),60);
+  } else {
+    const btn=document.createElement('button');
+    btn.className='heart-button';
+    btn.innerText='Click me ❤️';
+    btn.onclick=()=>document.getElementById('heartForm').style.display='block';
+    el.appendChild(document.createElement('br'));
+    el.appendChild(document.createElement('br'));
+    el.appendChild(btn);
+    btn.style.display='inline-block';
+  }
+}
+
+function createHeart(){
+  const heart=document.createElement('div');
+  heart.className='floating-heart';
+  const container=document.querySelector('.container').getBoundingClientRect();
+  heart.style.left=(container.left+Math.random()*container.width)+'px';
+  heart.style.top=(container.top+container.height-20)+'px';
+  heart.style.fontSize=(10+Math.random()*25)+'px';
+  heart.style.animationDuration=(4+Math.random()*3)+'s';
+  heart.innerText='❤️';
+  document.body.appendChild(heart);
+  setTimeout(()=>heart.remove(),7000);
+}
+</script>
+
+</body>
+</html>
