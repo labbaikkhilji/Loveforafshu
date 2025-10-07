@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Love at First Sight — for Afshu</title>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      background: radial-gradient(circle at top, #0d1b2a, #1b263b 70%);
+      overflow: hidden;
+      font-family: 'Dancing Script', cursive;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #fff;
+    }
+
+    #gameContainer {
+      position: relative;
+      text-align: left;
+      width: 90%;
+      max-width: 600px;
+      padding: 30px 20px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 25px;
+      box-shadow: 0 0 30px rgba(255,255,255,0.2);
+    }
+
+    .message {
+      font-size: 1.6rem;
+      margin-bottom: 10px;
+      min-height: 80px;
+      color: #ffccd5;
+      text-shadow: 0 0 8px #ffccd5, 0 0 15px #ff99c8;
+    }
+
+    .signature {
+      font-size: 1.2rem;
+      color: #ff99c8;
+      text-shadow: 0 0 5px #ff99c8;
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    button {
+      padding: 12px 25px;
+      font-size: 1.2rem;
+      border: none;
+      border-radius: 15px;
+      background: #ff6f91;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 0 20px rgba(255,255,255,0.3);
+      margin-top: 20px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s ease;
+    }
+
+    button.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    #heart {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      font-size: 4rem;
+      color: #ff99c8;
+      text-shadow: 0 0 15px #ff99c8;
+      animation: heartAnimation 2s forwards;
+    }
+
+    @keyframes heartAnimation {
+      0% {
+        transform: translate(-50%, -50%) scale(0);
+      }
+      50% {
+        transform: translate(-50%, -50%) scale(1.5);
+      }
+      100% {
+        transform: translate(-50%, -50%) scale(1);
+      }
+    }
+
+    #musicPlayer {
+      display: none;
+    }
+
+    .floating-petal {
+      position: absolute;
+      top: 100%;
+      animation: floatPetal 10s infinite;
+    }
+
+    .floating-petal:nth-child(odd) {
+      animation-duration: 12s;
+    }
+
+    @keyframes floatPetal {
+      0% {
+        transform: translateY(0) rotate(0deg);
+      }
+      100% {
+        transform: translateY(-100vh) rotate(360deg);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="gameContainer">
+    <div id="messageBox" class="message"></div>
+    <button id="actionButton" onclick="nextStep()">Start</button>
+    <div id="heart"></div>
+    <div class="signature">- From Labbaik 💌</div>
+  </div>
+
+  <audio id="musicPlayer" loop>
+    <source src="https://www.storyblocks.com/audio/stock/love-at-first-sight-instrumental-348875117.html" type="audio/mp3">
+    Your browser does not support the audio element.
+  </audio>
+
+  <script>
+    const messages = [
+      { text: "I wanna meet you so bad...", buttonText: "I miss you 💗" },
+      { text: "Every sunset reminds me of you... the world feels quieter when you're not here.", buttonText: "I'm thinking of you 💞" },
+      { text: "Even in the distance, your presence lingers in every thought, every heartbeat.", buttonText: "You mean so much to me 🌟" },
+      { text: "No matter how far apart we are, you live in every corner of my heart, forever.", buttonText: "I love you 💖" }
+    ];
+
+    let currentStep = 0;
+
+    function nextStep() {
+      if (currentStep < messages.length) {
+        showMessage(messages[currentStep].text, messages[currentStep].buttonText);
+        currentStep++;
+      } else {
+        showHeart();
+      }
+    }
+
+    function showMessage(text, buttonText) {
+      const messageBox = document.getElementById('messageBox');
+      const actionButton = document.getElementById('actionButton');
+
+      messageBox.textContent = '';
+      actionButton.textContent = '';
+      actionButton.classList.remove('show');
+
+      let i = 0;
+      const typingInterval = setInterval(() => {
+        messageBox.textContent += text.charAt(i);
+        i++;
+        if (i === text.length) {
+          clearInterval(typingInterval);
+          actionButton.textContent = buttonText;
+          actionButton.classList.add('show');
+        }
+      }, 100);
+    }
+
+    function showHeart() {
+      const heart = document.getElementById('heart');
+      heart.textContent = '💖';
+      setTimeout(() => {
+        heart.textContent = 'I love you too 💖';
+      }, 1000);
+    }
+
+    function playMusic() {
+      const musicPlayer = document.getElementById('musicPlayer');
+      musicPlayer.play();
+    }
+
+    function createFloatingPetals() {
+      const petalCount = 10;
+      for (let i = 0; i < petalCount; i++) {
+        const petal = document.createElement('div');
+        petal.classList.add('floating-petal');
+        petal.style.left = `${Math.random() * 100}vw`;
+        petal.style.animationDuration = `${Math.random() * 10 + 5}s`;
+        document.body.appendChild(petal);
+      }
+    }
+
+    window.onload = () => {
+      playMusic();
+      createFloatingPetals();
+      nextStep();
+    };
+  </script>
+</body>
+</html>
